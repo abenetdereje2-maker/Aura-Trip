@@ -4,6 +4,7 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 
 // Routes
+const seatRoutes = require("./routes/seat.routes");
 const authRoutes = require("./routes/auth.routes");
 const userRoutes = require("./routes/user.routes");
 const airlineRoutes = require("./routes/airline.routes");
@@ -66,6 +67,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/airlines", airlineRoutes);
 app.use("/api/airports", airportRoutes);
 app.use("/api/flights", flightRoutes);
+app.use("/api", seatRoutes);
 // ======================
 // 404 Middleware
 // ======================

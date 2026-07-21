@@ -19,6 +19,8 @@ enum UserRole {
 enum BookingStatus {
   PENDING
   CONFIRMED
+  CHECKED_IN
+  COMPLETED
   CANCELLED
 }
 
@@ -36,6 +38,20 @@ enum FlightStatus {
   DEPARTED
   ARRIVED
   CANCELLED
+}
+
+enum SeatStatus {
+  AVAILABLE
+  HELD
+  BOOKED
+  BLOCKED
+}
+
+enum SeatClass {
+  ECONOMY
+  PREMIUM_ECONOMY
+  BUSINESS
+  FIRST
 }
 
 //////////////////////////////////////////////////////
@@ -63,7 +79,8 @@ model User {
 //////////////////////////////////////////////////////
 
 model Airline {
-  id   String  @id @default(cuid())
+  id String @id @default(cuid())
+
   name String
   code String  @unique
   logo String?
@@ -127,8 +144,34 @@ model Flight {
 
   bookings Booking[]
 
+  seats Seat[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+//////////////////////////////////////////////////////
+// SEAT
+//////////////////////////////////////////////////////
+
+model Seat {
+  id String @id @default(cuid())
+
+  seatNumber String
+
+  class SeatClass @default(ECONOMY)
+
+  status SeatStatus @default(AVAILABLE)
+
+  flightId String
+  flight   Flight @relation(fields: [flightId], references: [id], onDelete: Cascade)
+
+  booking Booking?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([flightId, seatNumber])
 }
 
 //////////////////////////////////////////////////////
@@ -149,10 +192,13 @@ model Booking {
   bookingDate DateTime @default(now())
 
   userId String
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   flightId String
-  flight   Flight @relation(fields: [flightId], references: [id])
+  flight   Flight @relation(fields: [flightId], references: [id], onDelete: Cascade)
+
+  seatId String @unique
+  seat   Seat   @relation(fields: [seatId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

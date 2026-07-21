@@ -63,8 +63,8 @@ const createFlight = async (data) => {
       arrivalTime: new Date(data.arrivalTime),
       duration: Number(data.duration),
       price: Number(data.price),
-      totalSeats: Number(data.totalSeats),  
-      availableSeats: Number(data.availableSeats),
+      totalSeats: Number(data.totalSeats),
+      availableSeats: Number(data.totalSeats),
     },
     include: {
       airline: true,
@@ -72,10 +72,60 @@ const createFlight = async (data) => {
       arrivalAirport: true,
     },
   });
+  
+const seats = generateSeats(
+  Number(data.totalSeats),
+  flight.id
+);
 
+await prisma.seat.createMany({
+  data: seats,
+});
   return flight;
 };
+/**
+ * ==========================================
+ * Generate Seats for Flight
+ * ==========================================
+ */
+const generateSeats = (totalSeats, flightId) => {
+  const seats = [];
 
+  // First 2 rows = Business (4 seats per row)
+  for (let row = 1; row <= 2; row++) {
+    ["A", "B", "C", "D"].forEach((letter) => {
+      seats.push({
+        seatNumber: `${row}${letter}`,
+        class: "BUSINESS",
+        status: "AVAILABLE",
+        flightId,
+      });
+    });
+  }
+
+  // Remaining rows = Economy (6 seats per row)
+  let createdSeats = seats.length;
+  let row = 3;
+
+  while (createdSeats < totalSeats) {
+    ["A", "B", "C", "D", "E", "F"].forEach((letter) => {
+      if (createdSeats < totalSeats) {
+        seats.push({
+          seatNumber: `${row}${letter}`,
+          class: "ECONOMY",
+          status: "AVAILABLE",
+          flightId,
+        });
+
+        createdSeats++;
+      }
+    });
+
+    row++;
+  }
+
+  return seats;
+};
 // ==========================================
 // Get All Flights
 // ==========================================

@@ -49,9 +49,7 @@ const createFlightValidation = [
     .isFloat({ gt: 0 })
     .withMessage("Price must be greater than zero"),
 
-  body("availableSeats")
-    .isInt({ min: 1 })
-    .withMessage("Available seats must be at least 1"),
+  
 ];
 
 // ===============================
@@ -95,10 +93,6 @@ const updateFlightValidation = [
   body("price")
     .optional()
     .isFloat({ gt: 0 }),
-
-  body("availableSeats")
-    .optional()
-    .isInt({ min: 1 }),
 ];
 
 // ===============================
