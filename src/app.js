@@ -8,6 +8,7 @@ const authRoutes = require("./routes/auth.routes");
 const userRoutes = require("./routes/user.routes");
 const airlineRoutes = require("./routes/airline.routes");
 const airportRoutes = require("./routes/airport.routes");
+const flightRoutes = require("./routes/flight.routes");
 // Middlewares
 const notFound = require("./middleware/notFound.middleware");
 const errorHandler = require("./middleware/error.middleware");
@@ -64,6 +65,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/airlines", airlineRoutes);
 app.use("/api/airports", airportRoutes);
+app.use("/api/flights", flightRoutes);
 // ======================
 // 404 Middleware
 // ======================
