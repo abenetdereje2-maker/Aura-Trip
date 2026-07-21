@@ -1,0 +1,159 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+//////////////////////////////////////////////////////
+// ENUMS
+//////////////////////////////////////////////////////
+
+enum UserRole {
+  PASSENGER
+  ADMIN
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum FlightStatus {
+  SCHEDULED
+  BOARDING
+  DELAYED
+  DEPARTED
+  ARRIVED
+  CANCELLED
+}
+
+//////////////////////////////////////////////////////
+// USER
+//////////////////////////////////////////////////////
+
+model User {
+  id         String   @id @default(cuid())
+  firstName  String
+  lastName   String
+  email      String   @unique
+  password   String
+  phone      String?
+  role       UserRole @default(PASSENGER)
+  isVerified Boolean  @default(false)
+
+  bookings Booking[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+//////////////////////////////////////////////////////
+// AIRLINE
+//////////////////////////////////////////////////////
+
+model Airline {
+  id   String  @id @default(cuid())
+  name String
+  code String  @unique
+  logo String?
+
+  flights Flight[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+//////////////////////////////////////////////////////
+// AIRPORT
+//////////////////////////////////////////////////////
+
+model Airport {
+  id String @id @default(cuid())
+
+  code String @unique
+  name String
+
+  city    String
+  country String
+
+  departures Flight[] @relation("DepartureAirport")
+  arrivals   Flight[] @relation("ArrivalAirport")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+//////////////////////////////////////////////////////
+// FLIGHT
+//////////////////////////////////////////////////////
+
+model Flight {
+  id String @id @default(cuid())
+
+  flightNumber String @unique
+
+  departureTime DateTime
+  arrivalTime   DateTime
+
+  duration Int
+
+  price    Float
+  currency String @default("ETB")
+
+  totalSeats     Int
+  availableSeats Int
+
+  status FlightStatus @default(SCHEDULED)
+
+  airlineId String
+  airline   Airline @relation(fields: [airlineId], references: [id])
+
+  departureAirportId String
+  departureAirport   Airport @relation("DepartureAirport", fields: [departureAirportId], references: [id])
+
+  arrivalAirportId String
+  arrivalAirport   Airport @relation("ArrivalAirport", fields: [arrivalAirportId], references: [id])
+
+  bookings Booking[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+//////////////////////////////////////////////////////
+// BOOKING
+//////////////////////////////////////////////////////
+
+model Booking {
+  id String @id @default(cuid())
+
+  bookingReference String @unique
+
+  status BookingStatus @default(PENDING)
+
+  paymentStatus PaymentStatus @default(PENDING)
+
+  totalPrice Float
+
+  bookingDate DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  flightId String
+  flight   Flight @relation(fields: [flightId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
