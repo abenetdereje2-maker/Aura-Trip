@@ -7,7 +7,7 @@ const morgan = require("morgan");
 const authRoutes = require("./routes/auth.routes");
 const userRoutes = require("./routes/user.routes");
 const airlineRoutes = require("./routes/airline.routes");
-
+const airportRoutes = require("./routes/airport.routes");
 // Middlewares
 const notFound = require("./middleware/notFound.middleware");
 const errorHandler = require("./middleware/error.middleware");
@@ -63,7 +63,7 @@ app.post("/test", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/airlines", airlineRoutes);
-
+app.use("/api/airports", airportRoutes);
 // ======================
 // 404 Middleware
 // ======================
